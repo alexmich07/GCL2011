@@ -1,0 +1,19 @@
+{ test of boolean type}
+$c+
+module test3
+private
+ integer a,b;
+ Boolean x,y;
+
+ begin
+
+ b := 10;
+ a := 10;
+ y := a > b;
+
+ if  y < 2 ->
+ 	y := y + 1;
+ 	write 0;
+ [] ~ y  -> write 1;
+ fi;
+end.
