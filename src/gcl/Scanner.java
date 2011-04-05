@@ -73,7 +73,7 @@ class Buffer {
 
 /* Bergin Replacement Begin */
 //	public Buffer(String fileName) {
-
+	
 	public Buffer(String fileName, Scanner scanner) {
 		this.scanner = scanner;
 
@@ -128,7 +128,7 @@ class Buffer {
 			}
 		}
 	}
-
+	
 /* Bergin Addition Begin */
 	static boolean showLine = false;
 
@@ -141,12 +141,12 @@ class Buffer {
 //			return buf[bufPos++] & 0xff;  // mask out sign bits
 
 			final char eol = '\n'; // jbergin 10/05
-			if (showLine) // Assumes dos end lines.
+			if (showLine) // Assumes dos end lines. 
 			{	int i = bufPos + 1, j;
 				int size = 0;
 				for(;i < bufLen && buf[i] != eol; ++i) size++;
 				char s [] = new char[size + 1];
-				for(i = bufPos,j = 0; i < bufLen && buf[i] != eol; i++, j++)
+				for(i = bufPos,j = 0; i < bufLen && buf[i] != eol; i++, j++) 	
 					s[j] = (char)buf[i];
 				scanner.outFile().println(s);
 				showLine = false;
@@ -216,7 +216,7 @@ class Buffer {
 			bufPos = fileLen - bufStart;
 		}
 	}
-
+	
 	// Read the next chunk of bytes from the stream, increases the buffer
 	// if needed and updates the fields fileLen and bufLen.
 	// Returns the number of bytes read.
@@ -232,11 +232,11 @@ class Buffer {
 			buf = newBuf;
 			free = bufLen;
 		}
-
+		
 		int read;
 		try { read = stream.read(buf, bufLen, free); }
 		catch (IOException ioex) { throw new FatalError(ioex.getMessage()); }
-
+		
 		if (read > 0) {
 			fileLen = bufLen = (bufLen + read);
 			return read;
@@ -336,7 +336,7 @@ public class Scanner {
 	int oldEols;       // EOLs that appeared in a comment;
 	static final StartStates start; // maps initial token character to start state
 	static final Map<String, Integer> literals;      // maps literal strings to literal kinds
-
+	
 /* Bergin Addition Begin */
 	private PrintWriter out;
 
@@ -344,7 +344,7 @@ public class Scanner {
 
 	Token tokens;      // list of tokens already peeked (first token is a dummy)
 	Token pt;          // current peek token
-
+	
 	char[] tval = new char[16]; // token text used in NextToken(), dynamically enlarged
 	int tlen;          // length of current token
 
@@ -355,27 +355,27 @@ public class Scanner {
 		for (int i = 65; i <= 90; ++i) start.set(i, 1);
 		for (int i = 97; i <= 122; ++i) start.set(i, 1);
 		for (int i = 48; i <= 57; ++i) start.set(i, 2);
-		start.set(36, 13);
-		start.set(46, 16);
-		start.set(59, 17);
-		start.set(44, 18);
-		start.set(91, 37);
-		start.set(93, 19);
-		start.set(58, 20);
-		start.set(45, 38);
-		start.set(43, 24);
-		start.set(40, 25);
-		start.set(41, 26);
-		start.set(126, 27);
-		start.set(61, 28);
-		start.set(35, 29);
-		start.set(62, 39);
-		start.set(60, 40);
-		start.set(42, 32);
-		start.set(47, 33);
-		start.set(92, 34);
-		start.set(38, 35);
-		start.set(124, 36);
+		start.set(36, 13); 
+		start.set(46, 16); 
+		start.set(59, 17); 
+		start.set(44, 18); 
+		start.set(91, 37); 
+		start.set(93, 19); 
+		start.set(58, 20); 
+		start.set(45, 38); 
+		start.set(43, 24); 
+		start.set(40, 25); 
+		start.set(41, 26); 
+		start.set(126, 27); 
+		start.set(61, 28); 
+		start.set(35, 29); 
+		start.set(62, 39); 
+		start.set(60, 40); 
+		start.set(42, 32); 
+		start.set(47, 33); 
+		start.set(92, 34); 
+		start.set(38, 35); 
+		start.set(124, 36); 
 		start.set(Buffer.EOF, -1);
 		literals.put("module", new Integer(3));
 		literals.put("private", new Integer(4));
@@ -395,8 +395,8 @@ public class Scanner {
 		literals.put("false", new Integer(42));
 
 	}
-
-/* Bergin Replacement Begin */
+	
+/* Bergin Replacement Begin */	
 //	public Scanner(InputStream s) {
 //		buffer = new Buffer(s);
 //		Init();
@@ -413,23 +413,23 @@ public class Scanner {
 		try{out = new PrintWriter(new FileWriter(outFile));}catch(Exception xx){System.exit(0);}
 		Init();
 	}
-
+	
 	public Scanner(InputStream s, Writer outFile) {
 		buffer = new Buffer(s, this);
 		try{out = new PrintWriter(outFile);}catch(Exception xx){System.exit(0);}
 		Init();
 	}
-
+	
 	public PrintWriter outFile(){
 		return out;
 	}
-
+	
 	public Token currentToken(){
 		return t;
 	}
-
+	
 /* Bergin Replacement End */
-
+	
 	void Init () {
 /* Bergin Addition Begin */
 		out.println("Compiled on: " + new Date());
@@ -447,13 +447,13 @@ public class Scanner {
 /* Bergin Replacement Begin */
 //			buffer = new UTF8Buffer(buffer); col = 0; charPos = -1;
 			buffer = new UTF8Buffer(buffer, this); col = 0; charPos = -1;
-
+			
 /* Bergin Replacement End */
 			NextCh();
 		}
 		pt = tokens = new Token();  // first token is a dummy
 	}
-
+	
 	void NextCh() {
 		if (oldEols > 0) { ch = EOL; oldEols--; }
 		else {
@@ -467,7 +467,7 @@ public class Scanner {
 		}
 
 	}
-
+	
 	void AddCh() {
 		if (tlen >= tval.length) {
 			char[] newBuf = new char[2 * tval.length];
@@ -475,13 +475,13 @@ public class Scanner {
 			tval = newBuf;
 		}
 		if (ch != Buffer.EOF) {
-			tval[tlen++] = (char)ch;
+			tval[tlen++] = (char)ch; 
 
 			NextCh();
 		}
 
 	}
-
+	
 
 	boolean Comment0() {
 		int level = 1, pos0 = pos, line0 = line, col0 = col, charPos0 = charPos;
@@ -541,7 +541,7 @@ public class Scanner {
 
 		loop: for (;;) {
 			switch (state) {
-				case -1: { t.kind = eofSym; break loop; } // NextCh already done
+				case -1: { t.kind = eofSym; break loop; } // NextCh already done 
 				case 0: {
 					if (recKind != noSym) {
 						tlen = recEnd - t.pos;
@@ -660,14 +660,14 @@ public class Scanner {
 		t.val = new String(tval, 0, tlen);
 		return t;
 	}
-
+	
 	private void SetScannerBehindT() {
 		buffer.setPos(t.pos);
 		NextCh();
 		line = t.line; col = t.col; charPos = t.charPos;
 		for (int i = 0; i < tlen; i++) NextCh();
 	}
-
+	
 	// get the next token (possibly a token already seen during peeking)
 	public Token Scan () {
 		if (tokens.next == null) {

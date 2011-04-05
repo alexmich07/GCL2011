@@ -1,7 +1,6 @@
 package gcl;
 
 public class Parser {
-// GCL Version 2011
 	public static final int _EOF = 0;
 	public static final int _identifier = 1;
 	public static final int _numeral = 2;
@@ -21,9 +20,9 @@ public class Parser {
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
-
-	private Scanner scanner;
-	private Errors errors;
+	
+	public Scanner scanner;
+	public Errors errors;
 
 	static final boolean DIRECT = CodegenConstants.DIRECT;
 		static final boolean INDIRECT = CodegenConstants.INDIRECT;
@@ -31,9 +30,14 @@ public class Parser {
 		BooleanType booleanType = SemanticActions.BOOLEAN_TYPE;
 		TypeDescriptor noType = SemanticActions.NO_TYPE;
 
-/*==========================================================*/
+/*===========================================================*/
 
-
+/* Bergin replacement begin
+//	public Parser(Scanner scanner) {
+//		this.scanner = scanner;
+//		errors = new Errors();
+//	}
+*/
 	public Parser(Scanner scanner, SemanticActions actions, SemanticActions.GCLErrorStream err) {
 		this.scanner = scanner;
 		this.semantic = actions;
@@ -41,14 +45,18 @@ public class Parser {
 		this.err = err;
 	}
 
+	
 	private SemanticActions semantic;
 	private SemanticActions.GCLErrorStream err;
-
+	
 	public Scanner scanner(){
 		return scanner;
 	}
-
+	
 	public Token currentToken(){return t;}
+
+/* Bergin replacement END */
+
 
 	void SynErr (int n) {
 		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
@@ -56,47 +64,50 @@ public class Parser {
 	}
 
 	public void SemErr (String msg) {
-		if (errDist >= minErrDist) errors.Error(t.line, t.col, msg);
+		if (errDist >= minErrDist) errors.SemErr(t.line, t.col, msg);
 		errDist = 0;
 	}
-
+	
 	void Get () {
 		for (;;) {
 			t = la;
 			la = scanner.Scan();
-			if (la.kind <= maxT) { ++errDist; break; }
+			if (la.kind <= maxT) {
+				++errDist;
+				break;
+			}
 
 			if (la.kind == 44) {
-				CompilerOptions.listCode = la.val.charAt(2) == '+';
+				CompilerOptions.listCode = la.val.charAt(2) == '+'; 
 			}
 			if (la.kind == 45) {
-				CompilerOptions.optimize = la.val.charAt(2) == '+';
+				CompilerOptions.optimize = la.val.charAt(2) == '+'; 
 			}
 			if (la.kind == 46) {
-				SymbolTable.dumpAll();
+				SymbolTable.dumpAll(); 
 			}
 			if (la.kind == 47) {
 			}
 			if (la.kind == 48) {
-				CompilerOptions.showMessages = la.val.charAt(2) == '+';
+				CompilerOptions.showMessages = la.val.charAt(2) == '+'; 
 			}
 			if (la.kind == 49) {
-				CompilerOptions.printAllocatedRegisters();
+				CompilerOptions.printAllocatedRegisters(); 
 			}
 			if (la.kind == 50) {
 			}
 			la = t;
 		}
 	}
-
+	
 	void Expect (int n) {
 		if (la.kind==n) Get(); else { SynErr(n); }
 	}
-
+	
 	boolean StartOf (int s) {
 		return set[s][la.kind];
 	}
-
+	
 	void ExpectWeak (int n, int follow) {
 		if (la.kind == n) Get();
 		else {
@@ -104,31 +115,31 @@ public class Parser {
 			while (!StartOf(follow)) Get();
 		}
 	}
-
+	
 	boolean WeakSeparator (int n, int syFol, int repFol) {
-		boolean[] s = new boolean[maxT+1];
-		if (la.kind == n) { Get(); return true; }
+		int kind = la.kind;
+		if (kind == n) { Get(); return true; }
 		else if (StartOf(repFol)) return false;
 		else {
-			for (int i=0; i <= maxT; i++) {
-				s[i] = set[syFol][i] || set[repFol][i] || set[0][i];
-			}
 			SynErr(n);
-			while (!s[la.kind]) Get();
+			while (!(set[syFol][kind] || set[repFol][kind] || set[0][kind])) {
+				Get();
+				kind = la.kind;
+			}
 			return StartOf(syFol);
 		}
 	}
-
+	
 	void gcl() {
-		semantic.startCode();  SymbolTable scope = SymbolTable.currentScope();
+		semantic.startCode();  SymbolTable scope = SymbolTable.currentScope(); 
 		while (!(la.kind == 0 || la.kind == 3)) {SynErr(44); Get();}
 		module(scope);
 		while (la.kind == 3) {
-			scope = scope.openScope(true);
+			scope = scope.openScope(true); 
 			while (!(la.kind == 0 || la.kind == 3)) {SynErr(45); Get();}
 			module(scope);
 		}
-		semantic.finishCode();
+		semantic.finishCode(); 
 	}
 
 	void module(SymbolTable scope) {
@@ -137,7 +148,7 @@ public class Parser {
 		definitionPart(scope);
 		if (la.kind == 4) {
 			Get();
-			SymbolTable privateScope = scope.openScope(false);
+			SymbolTable privateScope = scope.openScope(false); 
 			block(privateScope);
 		}
 		Expect(5);
@@ -205,24 +216,24 @@ public class Parser {
 	}
 
 	void variableDefinition(SymbolTable scope, ParameterKind kindOfParam) {
-		TypeDescriptor type; Identifier id;
+		TypeDescriptor type; Identifier id; 
 		type = type();
 		Expect(1);
 		id = new Identifier(currentToken().spelling());
 		semantic.declareVariable(scope, type, id, kindOfParam);
-
+		
 		while (la.kind == 9) {
 			Get();
 			Expect(1);
 			id = new Identifier(currentToken().spelling());
 			semantic.declareVariable(scope, type, id, kindOfParam);
-
+			
 		}
 	}
 
 	TypeDescriptor  type() {
 		TypeDescriptor  result;
-		result = noType;
+		result = noType; 
 		if (la.kind == 10 || la.kind == 11) {
 			result = typeSymbol();
 		} else if (la.kind == 12) {
@@ -233,21 +244,21 @@ public class Parser {
 
 	TypeDescriptor  typeSymbol() {
 		TypeDescriptor  result;
-		result = noType;
+		result = noType; 
 		if (la.kind == 10) {
 			Get();
-			result = integerType;
+			result = integerType; 
 		} else if (la.kind == 11) {
 			Get();
-			result = booleanType;
+			result = booleanType; 
 		} else SynErr(52);
 		return result;
 	}
 
 	TupleType  tupleType() {
 		TupleType  result;
-		TypeDescriptor type; Identifier id;
-		TypeList carrier = new TypeList();
+		TypeDescriptor type; Identifier id; 
+		TypeList carrier = new TypeList(); 
 		Expect(12);
 		Expect(13);
 		type = typeSymbol();
@@ -260,7 +271,7 @@ public class Parser {
 			id = new Identifier(currentToken().spelling()); carrier.enter(type, id);
 		}
 		Expect(14);
-		result = new TupleType(carrier);
+		result = new TupleType(carrier); 
 		return result;
 	}
 
@@ -269,73 +280,73 @@ public class Parser {
 	}
 
 	void readStatement(SymbolTable scope) {
-		Expression exp;
+		Expression exp; 
 		Expect(16);
 		exp = variableAccessEtc(scope);
-		semantic.readVariable(exp);
+		semantic.readVariable(exp); 
 		while (la.kind == 9) {
 			Get();
 			exp = variableAccessEtc(scope);
-			semantic.readVariable(exp);
+			semantic.readVariable(exp); 
 		}
 	}
 
 	void writeStatement(SymbolTable scope) {
-		Expression exp;
+		Expression exp; 
 		Expect(17);
 		exp = expression(scope);
-		semantic.writeExpression(exp);
+		semantic.writeExpression(exp); 
 		while (la.kind == 9) {
 			Get();
 			exp = expression(scope);
-			semantic.writeExpression(exp);
+			semantic.writeExpression(exp); 
 		}
-		semantic.genEol();
+		semantic.genEol(); 
 	}
 
 	void assignStatement(SymbolTable scope) {
-		AssignRecord expressions = new AssignRecord(); Expression exp;
+		AssignRecord expressions = new AssignRecord(); Expression exp; 
 		exp = variableAccessEtc(scope);
-		expressions.left(exp);
+		expressions.left(exp); 
 		while (la.kind == 9) {
 			Get();
 			exp = variableAccessEtc(scope);
-			expressions.left(exp);
+			expressions.left(exp); 
 		}
 		Expect(18);
 		exp = expression(scope);
-		expressions.right(exp);
+		expressions.right(exp); 
 		while (la.kind == 9) {
 			Get();
 			exp = expression(scope);
-			expressions.right(exp);
+			expressions.right(exp); 
 		}
-		semantic.parallelAssign(expressions);
+		semantic.parallelAssign(expressions); 
 	}
 
 	void ifStatement(SymbolTable scope) {
-		GCRecord ifRecord;
+		GCRecord ifRecord; 
 		Expect(19);
-		ifRecord = semantic.startIf();
+		ifRecord = semantic.startIf(); 
 		guardedCommandList(scope, ifRecord );
 		Expect(20);
-		semantic.endIf(ifRecord);
+		semantic.endIf(ifRecord); 
 	}
 
 	void doStatement(SymbolTable scope) {
-		GCRecord doRecord;
+		GCRecord doRecord; 
 		Expect(23);
-		doRecord = semantic.startDo();
+		doRecord = semantic.startDo(); 
 		guardedCommandList(scope, doRecord );
 		Expect(24);
-		semantic.endDo(doRecord);
+		semantic.endDo(doRecord); 
 	}
 
 	Expression  variableAccessEtc(SymbolTable scope) {
 		Expression  result;
-		SemanticItem workValue;
+		SemanticItem workValue; 
 		workValue = qualifiedIdentifier(scope);
-		result = workValue.expectExpression(err);
+		result = workValue.expectExpression(err); 
 		return result;
 	}
 
@@ -354,29 +365,29 @@ public class Parser {
 	}
 
 	void guardedCommand(SymbolTable scope, GCRecord  ifRecord ) {
-		Expression expr;
+		Expression expr; 
 		expr = expression(scope);
-		semantic.ifTest(expr, ifRecord);
+		semantic.ifTest(expr, ifRecord); 
 		Expect(22);
 		statementPart(scope);
-		semantic.elseIf(ifRecord);
+		semantic.elseIf(ifRecord); 
 	}
 
 	Expression  relationalExpr(SymbolTable scope) {
 		Expression  left;
-		Expression right; RelationalOperator op;
+		Expression right; RelationalOperator op; 
 		left = simpleExpr(scope);
 		if (StartOf(6)) {
 			op = relationalOperator();
 			right = simpleExpr(scope);
-			left = semantic.compareExpression(left, op, right);
+			left = semantic.compareExpression(left, op, right); 
 		}
 		return left;
 	}
 
 	Expression  simpleExpr(SymbolTable scope) {
 		Expression  left;
-		Expression right; AddOperator op; left = null;
+		Expression right; AddOperator op; left = null; 
 		if (StartOf(7)) {
 			if (la.kind == 25) {
 				Get();
@@ -385,48 +396,48 @@ public class Parser {
 		} else if (la.kind == 26) {
 			Get();
 			left = term(scope);
-			left = semantic.negateExpression(left);
+			left = semantic.negateExpression(left); 
 		} else SynErr(53);
 		while (la.kind == 25 || la.kind == 26) {
 			op = addOperator();
 			right = term(scope);
-			left = semantic.addExpression(left, op, right);
+			left = semantic.addExpression(left, op, right); 
 		}
 		return left;
 	}
 
 	RelationalOperator  relationalOperator() {
 		RelationalOperator  op;
-		op = null;
+		op = null; 
 		switch (la.kind) {
 		case 30: {
 			Get();
-			op = RelationalOperator.EQUAL;
+			op = RelationalOperator.EQUAL; 
 			break;
 		}
 		case 31: {
 			Get();
-			op = RelationalOperator.NOT_EQUAL;
+			op = RelationalOperator.NOT_EQUAL; 
 			break;
 		}
 		case 32: {
 			Get();
-			op = RelationalOperator.GREATER;
+			op = RelationalOperator.GREATER; 
 			break;
 		}
 		case 33: {
 			Get();
-			op = RelationalOperator.GREATER_OR_EQUAL;
+			op = RelationalOperator.GREATER_OR_EQUAL; 
 			break;
 		}
 		case 34: {
 			Get();
-			op = RelationalOperator.LESS;
+			op = RelationalOperator.LESS; 
 			break;
 		}
 		case 35: {
 			Get();
-			op = RelationalOperator.LESS_OR_EQUAL;
+			op = RelationalOperator.LESS_OR_EQUAL; 
 			break;
 		}
 		default: SynErr(54); break;
@@ -436,32 +447,32 @@ public class Parser {
 
 	Expression  term(SymbolTable scope) {
 		Expression  left;
-		Expression right; MultiplyOperator op;
+		Expression right; MultiplyOperator op; 
 		left = factor(scope);
 		while (la.kind == 36 || la.kind == 37 || la.kind == 38) {
 			op = multiplyOperator();
 			right = factor(scope);
-			left = semantic.multiplyExpression(left, op, right);
+			left = semantic.multiplyExpression(left, op, right); 
 		}
 		return left;
 	}
 
 	AddOperator  addOperator() {
 		AddOperator  op;
-		op = null;
+		op = null; 
 		if (la.kind == 25) {
 			Get();
-			op = AddOperator.PLUS;
+			op = AddOperator.PLUS; 
 		} else if (la.kind == 26) {
 			Get();
-			op = AddOperator.MINUS;
+			op = AddOperator.MINUS; 
 		} else SynErr(55);
 		return op;
 	}
 
 	Expression  factor(SymbolTable scope) {
 		Expression  result;
-		result = null;
+		result = null; 
 		switch (la.kind) {
 		case 1: {
 			result = variableAccessEtc(scope);
@@ -470,7 +481,7 @@ public class Parser {
 		case 2: {
 			Get();
 			result = new ConstantExpression (integerType, Integer.parseInt(currentToken().spelling()));
-
+			
 			break;
 		}
 		case 41: case 42: {
@@ -486,23 +497,23 @@ public class Parser {
 		case 13: {
 			Expression exp;
 			ExpressionList tupleFields = new ExpressionList();
-
+			
 			Get();
 			exp = expression(scope);
-			tupleFields.enter(exp);
+			tupleFields.enter(exp); 
 			while (la.kind == 9) {
 				Get();
 				exp = expression(scope);
-				tupleFields.enter(exp);
+				tupleFields.enter(exp); 
 			}
 			Expect(14);
-			result = semantic.buildTuple(tupleFields);
+			result = semantic.buildTuple(tupleFields); 
 			break;
 		}
 		case 29: {
 			Get();
 			result = factor(scope);
-			result = semantic.negateBoolean(result);
+			result = semantic.negateBoolean(result); 
 			break;
 		}
 		default: SynErr(56); break;
@@ -512,42 +523,42 @@ public class Parser {
 
 	MultiplyOperator  multiplyOperator() {
 		MultiplyOperator  op;
-		op = null;
+		op = null; 
 		if (la.kind == 36) {
 			Get();
-			op = MultiplyOperator.TIMES;
+			op = MultiplyOperator.TIMES; 
 		} else if (la.kind == 37) {
 			Get();
-			op = MultiplyOperator.DIVIDE;
+			op = MultiplyOperator.DIVIDE; 
 		} else if (la.kind == 38) {
 			Get();
-			op = MultiplyOperator.MODULO;
+			op = MultiplyOperator.MODULO; 
 		} else SynErr(57);
 		return op;
 	}
 
 	Expression  booleanConstant(SymbolTable scope) {
 		Expression  result;
-		result = null;
+		result = null; 
 		if (la.kind == 41) {
 			Get();
-			result = new ConstantExpression (booleanType, Integer.parseInt("1"));
+			result = new ConstantExpression (booleanType, Integer.parseInt("1")); 
 		} else if (la.kind == 42) {
 			Get();
-			result = new ConstantExpression (booleanType, Integer.parseInt("0"));
+			result = new ConstantExpression (booleanType, Integer.parseInt("0")); 
 		} else SynErr(58);
 		return result;
 	}
 
 	BooleanOperator  booleanOperator() {
 		BooleanOperator  op;
-		op = null;
+		op = null; 
 		if (la.kind == 39) {
 			Get();
-			op = BooleanOperator.AND;
+			op = BooleanOperator.AND; 
 		} else if (la.kind == 40) {
 			Get();
-			op = BooleanOperator.OR;
+			op = BooleanOperator.OR; 
 		} else SynErr(59);
 		return op;
 	}
@@ -556,7 +567,7 @@ public class Parser {
 		SemanticItem  result;
 		Expect(1);
 		Identifier id = new Identifier(currentToken().spelling());
-		result = semantic.semanticValue(scope, id);
+		result = semantic.semanticValue(scope, id); 
 		return result;
 	}
 
@@ -564,15 +575,14 @@ public class Parser {
 
 	public void Parse() {
 		la = new Token();
-		la.val = "";
+		la.val = "";		
 		Get();
 		gcl();
 		Expect(0);
 
-		Expect(0);
 	}
 
-	private boolean[][] set = {
+	private static final boolean[][] set = {
 		{T,T,x,T, x,x,T,x, x,x,T,T, T,x,x,T, T,T,x,T, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
 		{T,x,x,x, x,x,x,x, x,x,T,T, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
 		{T,T,x,T, T,T,T,x, x,x,T,T, T,x,x,T, T,T,x,T, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
@@ -587,16 +597,28 @@ public class Parser {
 
 
 class Errors {
-	public int count = 0;
-	public String errMsgFormat = "-- line {0} col {1}: {2}";
+	public int count = 0;                                    // number of errors detected
+/* Bergin Replacement begin */
 	Scanner scanner;
+//	public java.io.PrintStream errorStream = System.out;     // error messages go to this stream
+
+		public java.io.PrintWriter errorStream;     // error messages go to this stream
+
+/* Bergin Replacement end */
+
+	public String errMsgFormat = "-- line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
+	
+/* Bergin Addition Begin */
 
 	public Errors(Scanner scanner)
 	{
 		this.scanner = scanner;
+		 errorStream = scanner.outFile();
 	}
 
-	private void printMsg(int line, int column, String msg) {
+/* Bergin Addition END */
+	
+	protected void printMsg(int line, int column, String msg) {
 		StringBuffer b = new StringBuffer(errMsgFormat);
 		int pos = b.indexOf("{0}");
 		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, line); }
@@ -604,12 +626,13 @@ class Errors {
 		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, column); }
 		pos = b.indexOf("{2}");
 		if (pos >= 0) b.replace(pos, pos+3, msg);
-		scanner.outFile().println(b.toString());
+		errorStream.println(b.toString());
+	
 	}
-
+	
 	public void SynErr (int line, int col, int n) {
-			String s;
-			switch (n) {
+		String s;
+		switch (n) {
 			case 0: s = "EOF expected"; break;
 			case 1: s = "identifier expected"; break;
 			case 2: s = "numeral expected"; break;
@@ -670,20 +693,26 @@ class Errors {
 			case 57: s = "invalid multiplyOperator"; break;
 			case 58: s = "invalid booleanConstant"; break;
 			case 59: s = "invalid booleanOperator"; break;
-				default: s = "error " + n; break;
-			}
-			printMsg(line, col, s);
-			count++;
-			CompilerOptions.genHalt();
-	}
-
-	public void SemErr (int line, int col, int n) {
-		printMsg(line, col, "error " + n);
+			default: s = "error " + n; break;
+		}
+		printMsg(line, col, s);
 		count++;
 	}
 
+	public void SemErr (int line, int col, String s) {	
+		printMsg(line, col, s);
+		count++;
+	}
+	
+	public void SemErr (String s) {
+		errorStream.println(s);
+		count++;
+	}
+	
+/* Bergin Addition Begin */
+
 	void semanticError(int n){
-		SemErr(scanner.t.line, scanner.t.col, n);
+		SemErr(scanner.t.line, scanner.t.col, n); 
 	}
 
 	void semanticError(int n, int line, int col){
@@ -700,16 +729,22 @@ class Errors {
 		semanticError(n);
 	}
 
-	public void Error (int line, int col, String s) {
-		printMsg(line, col, s);
+	public void SemErr (int line, int col, int n) {
+		printMsg(line, col, "error " + n);
 		count++;
 	}
 
-	public void Exception (String s) {
-		scanner.outFile().println(s);
-		System.exit(1);
+/* Bergin Addition END */
+	
+	public void Warning (int line, int col, String s) {	
+		printMsg(line, col, s);
+	}
+	
+	public void Warning (String s) {
+		errorStream.println(s);
 	}
 } // Errors
+
 
 class FatalError extends RuntimeException {
 	public static final long serialVersionUID = 1L;
