@@ -1,4 +1,4 @@
 *.class
 *.swp
-Parser.java
-Scanner.java
+src/gcl/Parser.java
+src/gcl/Scanner.java
