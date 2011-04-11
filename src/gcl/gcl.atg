@@ -33,7 +33,7 @@ PRAGMAS
 	option10 = "$"("r"|"R")"-".  /* ignore */
 
 COMMENTS FROM "{" TO "}" NESTED
-COMMENTS FROM "--" TO eol
+COMMENTS FROM "--" TO nl
 
 IGNORE eol + tab + nl
 
@@ -130,7 +130,7 @@ writeStatement<SymbolTable scope>      (. Expression exp; .)
 	"write" expression<^exp, scope>  (. semantic.writeExpression(exp); .)
 		{  "," expression<^exp, scope>  (. semantic.writeExpression(exp); .) }
 		(. semantic.genEol(); .).
-/*----------------------------------------------------------*/
+/*-----------------------------------------------------------*/
 assignStatement<SymbolTable scope>
 		(. AssignRecord expressions = new AssignRecord(); Expression exp; .)
 =
@@ -143,21 +143,21 @@ assignStatement<SymbolTable scope>
 /*----------------------------------------------------------*/
 ifStatement<SymbolTable scope>  (. GCRecord ifRecord; .)
 =
-	"if" (. ifRecord = semantic.startIf(); .)  guardedCommandList<scope, ifRecord >
+	"if" (. ifRecord = semantic.startIf(); .)  guardedCommandList<scope, ifRecord, "if">
 	"fi" (. semantic.endIf(ifRecord); .).
 /*----------------------------------------------------------*/
-guardedCommandList<SymbolTable scope, GCRecord ifRecord>
+guardedCommandList<SymbolTable scope, GCRecord ifRecord, String conditionalType>
 =
-	guardedCommand<scope, ifRecord> { "[]" guardedCommand<scope, ifRecord> }.
+	guardedCommand<scope, ifRecord, conditionalType> { "[]" guardedCommand<scope, ifRecord, conditionalType> }.
 /*----------------------------------------------------------*/
-guardedCommand<SymbolTable scope, GCRecord  ifRecord >  (.  Expression expr; .)
+guardedCommand<SymbolTable scope, GCRecord  ifRecord, String conditionalType >  (.  Expression expr; .)
 =
-	expression<^expr, scope> (. semantic.ifTest(expr, ifRecord); .)  "->"
+	expression<^expr, scope> (. semantic.ifTest(expr, ifRecord, conditionalType); .)  "->"
 	statementPart<scope>  (. semantic.elseIf(ifRecord); .).
 /*----------------------------------------------------------*/
 doStatement<SymbolTable scope>  (. GCRecord doRecord; .)
 =
-	"do" (. doRecord = semantic.startDo(); .)  guardedCommandList<scope, doRecord >
+	"do" (. doRecord = semantic.startDo(); .)  guardedCommandList<scope, doRecord, "do">
 	"od" (. semantic.endDo(doRecord); .) .
 /*----------------------------------------------------------*/
 expression<^Expression left, SymbolTable scope>

@@ -30,7 +30,7 @@ public class Parser {
 		BooleanType booleanType = SemanticActions.BOOLEAN_TYPE;
 		TypeDescriptor noType = SemanticActions.NO_TYPE;
 
-/*===========================================================*/
+/*==========================================================*/
 
 /* Bergin replacement begin
 //	public Parser(Scanner scanner) {
@@ -328,7 +328,7 @@ public class Parser {
 		GCRecord ifRecord; 
 		Expect(19);
 		ifRecord = semantic.startIf(); 
-		guardedCommandList(scope, ifRecord );
+		guardedCommandList(scope, ifRecord, "if");
 		Expect(20);
 		semantic.endIf(ifRecord); 
 	}
@@ -337,7 +337,7 @@ public class Parser {
 		GCRecord doRecord; 
 		Expect(23);
 		doRecord = semantic.startDo(); 
-		guardedCommandList(scope, doRecord );
+		guardedCommandList(scope, doRecord, "do");
 		Expect(24);
 		semantic.endDo(doRecord); 
 	}
@@ -356,18 +356,18 @@ public class Parser {
 		return left;
 	}
 
-	void guardedCommandList(SymbolTable scope, GCRecord ifRecord) {
-		guardedCommand(scope, ifRecord);
+	void guardedCommandList(SymbolTable scope, GCRecord ifRecord, String conditionalType) {
+		guardedCommand(scope, ifRecord, conditionalType);
 		while (la.kind == 21) {
 			Get();
-			guardedCommand(scope, ifRecord);
+			guardedCommand(scope, ifRecord, conditionalType);
 		}
 	}
 
-	void guardedCommand(SymbolTable scope, GCRecord  ifRecord ) {
+	void guardedCommand(SymbolTable scope, GCRecord  ifRecord, String conditionalType ) {
 		Expression expr; 
 		expr = expression(scope);
-		semantic.ifTest(expr, ifRecord); 
+		semantic.ifTest(expr, ifRecord, conditionalType); 
 		Expect(22);
 		statementPart(scope);
 		semantic.elseIf(ifRecord); 
