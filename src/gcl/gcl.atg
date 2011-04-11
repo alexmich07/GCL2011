@@ -33,7 +33,7 @@ PRAGMAS
 	option10 = "$"("r"|"R")"-".  /* ignore */
 
 COMMENTS FROM "{" TO "}" NESTED
-COMMENTS FROM "--" TO eol
+COMMENTS FROM "--" TO nl
 
 IGNORE eol + tab + nl
 

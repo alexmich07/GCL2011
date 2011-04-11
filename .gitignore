@@ -2,5 +2,11 @@
 *.swp
 src/gcl/Parser.java
 src/gcl/Scanner.java
+tests/results
+bin/OBJ
+bin/codefile
+.settings
+bin/gcl/Scanner.class
+src/gcl/Parser.java
+src/gcl/Scanner.java
 
-settings/*
