@@ -2,3 +2,5 @@
 *.swp
 src/gcl/Parser.java
 src/gcl/Scanner.java
+
+settings/*
