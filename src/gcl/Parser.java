@@ -30,7 +30,7 @@ public class Parser {
 		BooleanType booleanType = SemanticActions.BOOLEAN_TYPE;
 		TypeDescriptor noType = SemanticActions.NO_TYPE;
 
-/*===========================================================*/
+/*==========================================================*/
 
 /* Bergin replacement begin
 //	public Parser(Scanner scanner) {
