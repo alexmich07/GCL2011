@@ -328,7 +328,7 @@ public class Parser {
 		GCRecord ifRecord; 
 		Expect(19);
 		ifRecord = semantic.startIf(); 
-		guardedCommandList(scope, ifRecord, "if");
+		guardedCommandList(scope, ifRecord);
 		Expect(20);
 		semantic.endIf(ifRecord); 
 	}
@@ -337,7 +337,7 @@ public class Parser {
 		GCRecord doRecord; 
 		Expect(23);
 		doRecord = semantic.startDo(); 
-		guardedCommandList(scope, doRecord, "do");
+		guardedCommandList(scope, doRecord);
 		Expect(24);
 		semantic.endDo(doRecord); 
 	}
@@ -352,25 +352,45 @@ public class Parser {
 
 	Expression  expression(SymbolTable scope) {
 		Expression  left;
-		left = relationalExpr(scope);
+		Expression right; BooleanOperator op; 
+		left = andExpression(scope);
+		while (la.kind == 25) {
+			Get();
+			op = BooleanOperator.OR; 
+			right = andExpression(scope);
+			left = semantic.logicalExpression(left, op, right); 
+		}
 		return left;
 	}
 
-	void guardedCommandList(SymbolTable scope, GCRecord ifRecord, String conditionalType) {
-		guardedCommand(scope, ifRecord, conditionalType);
+	void guardedCommandList(SymbolTable scope, GCRecord ifRecord) {
+		guardedCommand(scope, ifRecord);
 		while (la.kind == 21) {
 			Get();
-			guardedCommand(scope, ifRecord, conditionalType);
+			guardedCommand(scope, ifRecord);
 		}
 	}
 
-	void guardedCommand(SymbolTable scope, GCRecord  ifRecord, String conditionalType ) {
+	void guardedCommand(SymbolTable scope, GCRecord  ifRecord) {
 		Expression expr; 
 		expr = expression(scope);
-		semantic.ifTest(expr, ifRecord, conditionalType); 
+		semantic.ifTest(expr, ifRecord); 
 		Expect(22);
 		statementPart(scope);
 		semantic.elseIf(ifRecord); 
+	}
+
+	Expression  andExpression(SymbolTable scope) {
+		Expression  left;
+		Expression right; BooleanOperator op; 
+		left = relationalExpr(scope);
+		while (la.kind == 26) {
+			Get();
+			op = BooleanOperator.AND; 
+			right = relationalExpr(scope);
+			left = semantic.logicalExpression(left, op, right); 
+		}
+		return left;
 	}
 
 	Expression  relationalExpr(SymbolTable scope) {
@@ -389,16 +409,16 @@ public class Parser {
 		Expression  left;
 		Expression right; AddOperator op; left = null; 
 		if (StartOf(7)) {
-			if (la.kind == 25) {
+			if (la.kind == 27) {
 				Get();
 			}
 			left = term(scope);
-		} else if (la.kind == 26) {
+		} else if (la.kind == 28) {
 			Get();
 			left = term(scope);
 			left = semantic.negateExpression(left); 
 		} else SynErr(53);
-		while (la.kind == 25 || la.kind == 26) {
+		while (la.kind == 27 || la.kind == 28) {
 			op = addOperator();
 			right = term(scope);
 			left = semantic.addExpression(left, op, right); 
@@ -410,32 +430,32 @@ public class Parser {
 		RelationalOperator  op;
 		op = null; 
 		switch (la.kind) {
-		case 30: {
+		case 32: {
 			Get();
 			op = RelationalOperator.EQUAL; 
 			break;
 		}
-		case 31: {
+		case 33: {
 			Get();
 			op = RelationalOperator.NOT_EQUAL; 
 			break;
 		}
-		case 32: {
+		case 34: {
 			Get();
 			op = RelationalOperator.GREATER; 
 			break;
 		}
-		case 33: {
+		case 35: {
 			Get();
 			op = RelationalOperator.GREATER_OR_EQUAL; 
 			break;
 		}
-		case 34: {
+		case 36: {
 			Get();
 			op = RelationalOperator.LESS; 
 			break;
 		}
-		case 35: {
+		case 37: {
 			Get();
 			op = RelationalOperator.LESS_OR_EQUAL; 
 			break;
@@ -449,7 +469,7 @@ public class Parser {
 		Expression  left;
 		Expression right; MultiplyOperator op; 
 		left = factor(scope);
-		while (la.kind == 36 || la.kind == 37 || la.kind == 38) {
+		while (la.kind == 38 || la.kind == 39 || la.kind == 40) {
 			op = multiplyOperator();
 			right = factor(scope);
 			left = semantic.multiplyExpression(left, op, right); 
@@ -460,10 +480,10 @@ public class Parser {
 	AddOperator  addOperator() {
 		AddOperator  op;
 		op = null; 
-		if (la.kind == 25) {
+		if (la.kind == 27) {
 			Get();
 			op = AddOperator.PLUS; 
-		} else if (la.kind == 26) {
+		} else if (la.kind == 28) {
 			Get();
 			op = AddOperator.MINUS; 
 		} else SynErr(55);
@@ -488,10 +508,10 @@ public class Parser {
 			result = booleanConstant(scope);
 			break;
 		}
-		case 27: {
+		case 29: {
 			Get();
 			result = expression(scope);
-			Expect(28);
+			Expect(30);
 			break;
 		}
 		case 13: {
@@ -510,7 +530,7 @@ public class Parser {
 			result = semantic.buildTuple(tupleFields); 
 			break;
 		}
-		case 29: {
+		case 31: {
 			Get();
 			result = factor(scope);
 			result = semantic.negateBoolean(result); 
@@ -524,13 +544,13 @@ public class Parser {
 	MultiplyOperator  multiplyOperator() {
 		MultiplyOperator  op;
 		op = null; 
-		if (la.kind == 36) {
+		if (la.kind == 38) {
 			Get();
 			op = MultiplyOperator.TIMES; 
-		} else if (la.kind == 37) {
+		} else if (la.kind == 39) {
 			Get();
 			op = MultiplyOperator.DIVIDE; 
-		} else if (la.kind == 38) {
+		} else if (la.kind == 40) {
 			Get();
 			op = MultiplyOperator.MODULO; 
 		} else SynErr(57);
@@ -553,10 +573,10 @@ public class Parser {
 	BooleanOperator  booleanOperator() {
 		BooleanOperator  op;
 		op = null; 
-		if (la.kind == 39) {
+		if (la.kind == 26) {
 			Get();
 			op = BooleanOperator.AND; 
-		} else if (la.kind == 40) {
+		} else if (la.kind == 25) {
 			Get();
 			op = BooleanOperator.OR; 
 		} else SynErr(59);
@@ -589,8 +609,8 @@ public class Parser {
 		{T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,T, T,T,x,T, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
 		{T,T,x,T, x,x,T,T, x,x,T,T, T,x,x,T, T,T,x,T, T,T,x,T, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
 		{x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,T, T,T,x,T, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,T,T, x,x,x,x, x,x,x,x, x},
-		{x,T,T,x, x,x,x,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,T,T,x, x}
+		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,x,x, x,x,x,x, x},
+		{x,T,T,x, x,x,x,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,T,x,T, x,x,x,x, x,x,x,x, x,T,T,x, x}
 
 	};
 } // end Parser
@@ -658,22 +678,22 @@ class Errors {
 			case 22: s = "\"->\" expected"; break;
 			case 23: s = "\"do\" expected"; break;
 			case 24: s = "\"od\" expected"; break;
-			case 25: s = "\"+\" expected"; break;
-			case 26: s = "\"-\" expected"; break;
-			case 27: s = "\"(\" expected"; break;
-			case 28: s = "\")\" expected"; break;
-			case 29: s = "\"~\" expected"; break;
-			case 30: s = "\"=\" expected"; break;
-			case 31: s = "\"#\" expected"; break;
-			case 32: s = "\">\" expected"; break;
-			case 33: s = "\">=\" expected"; break;
-			case 34: s = "\"<\" expected"; break;
-			case 35: s = "\"<=\" expected"; break;
-			case 36: s = "\"*\" expected"; break;
-			case 37: s = "\"/\" expected"; break;
-			case 38: s = "\"\\\\\" expected"; break;
-			case 39: s = "\"&\" expected"; break;
-			case 40: s = "\"|\" expected"; break;
+			case 25: s = "\"|\" expected"; break;
+			case 26: s = "\"&\" expected"; break;
+			case 27: s = "\"+\" expected"; break;
+			case 28: s = "\"-\" expected"; break;
+			case 29: s = "\"(\" expected"; break;
+			case 30: s = "\")\" expected"; break;
+			case 31: s = "\"~\" expected"; break;
+			case 32: s = "\"=\" expected"; break;
+			case 33: s = "\"#\" expected"; break;
+			case 34: s = "\">\" expected"; break;
+			case 35: s = "\">=\" expected"; break;
+			case 36: s = "\"<\" expected"; break;
+			case 37: s = "\"<=\" expected"; break;
+			case 38: s = "\"*\" expected"; break;
+			case 39: s = "\"/\" expected"; break;
+			case 40: s = "\"\\\\\" expected"; break;
 			case 41: s = "\"true\" expected"; break;
 			case 42: s = "\"false\" expected"; break;
 			case 43: s = "??? expected"; break;

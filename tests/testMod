@@ -2,19 +2,19 @@
 $c+
 module test3
 private
- integer a,b,y;
- Boolean x;
+ integer a,b;
+ Boolean x,y;
 
  begin
 
  b := 10;
  a := 10;
- y := a;
+ y := a < b;
+ x := a >= b;
 
- if  y < b ->
- 	y := y + 1;
- 	write 0;
- []  y >= b ->
- 	write y;
+ if a < 12 | b > 12 ->
+ 	write a;
+ []  a > 9 & b > 2 ->
+ 	write 1;
  fi;
 end.

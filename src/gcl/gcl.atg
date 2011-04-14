@@ -98,7 +98,7 @@ type<^TypeDescriptor result>	(. result = noType; .)
 =
 	typeSymbol<^result>   |  tupleType<^result>.
 /*----------------------------------------------------------*/
-typeSymbol<^TypeDescriptor result> (. result = noType; .) // ADD: scope (. result = noType; .)
+typeSymbol<^TypeDescriptor result> (. result = noType; .)
 =
 	"integer" (. result = integerType; .) | "Boolean" (. result = booleanType; .) .
 /*----------------------------------------------------------*/
@@ -143,26 +143,34 @@ assignStatement<SymbolTable scope>
 /*----------------------------------------------------------*/
 ifStatement<SymbolTable scope>  (. GCRecord ifRecord; .)
 =
-	"if" (. ifRecord = semantic.startIf(); .)  guardedCommandList<scope, ifRecord, "if">
+	"if" (. ifRecord = semantic.startIf(); .)  guardedCommandList<scope, ifRecord>
 	"fi" (. semantic.endIf(ifRecord); .).
 /*----------------------------------------------------------*/
-guardedCommandList<SymbolTable scope, GCRecord ifRecord, String conditionalType>
+guardedCommandList<SymbolTable scope, GCRecord ifRecord>
 =
-	guardedCommand<scope, ifRecord, conditionalType> { "[]" guardedCommand<scope, ifRecord, conditionalType> }.
+	guardedCommand<scope, ifRecord> { "[]" guardedCommand<scope, ifRecord> }.
 /*----------------------------------------------------------*/
-guardedCommand<SymbolTable scope, GCRecord  ifRecord, String conditionalType >  (.  Expression expr; .)
+guardedCommand<SymbolTable scope, GCRecord  ifRecord>  (.  Expression expr; .)
 =
-	expression<^expr, scope> (. semantic.ifTest(expr, ifRecord, conditionalType); .)  "->"
+	expression<^expr, scope> (. semantic.ifTest(expr, ifRecord); .)  "->"
 	statementPart<scope>  (. semantic.elseIf(ifRecord); .).
 /*----------------------------------------------------------*/
 doStatement<SymbolTable scope>  (. GCRecord doRecord; .)
 =
-	"do" (. doRecord = semantic.startDo(); .)  guardedCommandList<scope, doRecord, "do">
+	"do" (. doRecord = semantic.startDo(); .)  guardedCommandList<scope, doRecord>
 	"od" (. semantic.endDo(doRecord); .) .
 /*----------------------------------------------------------*/
-expression<^Expression left, SymbolTable scope>
+expression<^Expression left, SymbolTable scope> (. Expression right; BooleanOperator op; .)
 =
-	relationalExpr<^left, scope> .
+	andExpression<^ left, scope>
+	{ "|" (. op = BooleanOperator.OR; .)  andExpression<^right, scope>
+	(. left = semantic.logicalExpression(left, op, right); .) }.
+/*----------------------------------------------------------*/
+andExpression<^Expression left, SymbolTable scope> (. Expression right; BooleanOperator op; .)
+=
+	relationalExpr<^left, scope>
+	{ "&" (. op = BooleanOperator.AND; .)  relationalExpr<^right, scope>
+	(. left = semantic.logicalExpression(left, op, right); .) }.
 /*----------------------------------------------------------*/
 relationalExpr<^Expression left, SymbolTable scope>
 	(. Expression right; RelationalOperator op; .)
@@ -189,7 +197,7 @@ term<^Expression left, SymbolTable scope>
 	factor<^ left, scope> { multiplyOperator<^op>  factor<^right, scope>
 	(. left = semantic.multiplyExpression(left, op, right); .) }.
 /*----------------------------------------------------------*/
-factor<^Expression result, SymbolTable scope>  (. result = null; .)
+factor<^Expression result, SymbolTable scope> (. result = null; .)
 =
 	   variableAccessEtc<^result, scope>
 	|  numeral

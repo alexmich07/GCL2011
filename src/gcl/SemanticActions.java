@@ -1257,23 +1257,13 @@ public class SemanticActions implements Mnemonic, CodegenConstants {
 	 * @param expression Expression to be tested: must be boolean
 	 * @param entry GCRecord with the associated labels. This is updated
 	 **************************************************************************/
-	void ifTest(final Expression expression, final GCRecord entry, final String conditionalType) {
-		if( conditionalType.equals("if")) {
-			int resultreg = codegen.loadRegister(expression);
-			int nextElse = codegen.getLabel();
-			entry.nextLabel(nextElse);
-			codegen.gen2Address(IC, resultreg, IMMED, UNUSED, 1);
-			codegen.genJumpLabel(JNE, 'J', nextElse);
-			codegen.freeTemp(DREG, resultreg);
-		} 
-		else {
-			int resultreg = codegen.loadRegister(expression);
-			int nextElse = codegen.getLabel();
-			entry.nextLabel(nextElse);
-			codegen.gen2Address(IC, resultreg, IMMED, UNUSED, 1);
-			codegen.genJumpLabel(JNE, 'J', nextElse);
-			codegen.freeTemp(DREG, resultreg);
-		}
+	void ifTest(final Expression expression, final GCRecord entry) {
+		int resultreg = codegen.loadRegister(expression);
+		int nextElse = codegen.getLabel();
+		entry.nextLabel(nextElse);
+		codegen.gen2Address(IC, resultreg, IMMED, UNUSED, 1);
+		codegen.genJumpLabel(JNE, 'J', nextElse);
+		codegen.freeTemp(DREG, resultreg);
 	}
 
 	/***************************************************************************

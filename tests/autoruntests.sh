@@ -1,16 +1,16 @@
 #!/bin/sh
-#java -cp . gcl.GCLCompiler ../tests/test0 ../tests/results/test0list.txt
-#../sam3
-#../macc3 <../tests/test0.dat >../tests/results/test0.result
-#java -cp . gcl.GCLCompiler ../tests/test0.fix ../tests/results/test0fixlist.txt
-#../sam3
-#../macc3 <../tests/test0.dat >../tests/results/test0fix.result
-#java -cp . gcl.GCLCompiler ../tests/test1_1 ../tests/results/test1_1list.txt
-#../sam3
-#../macc3 <../tests/test1_1.dat >../tests/results/test1_1.result
-#java -cp . gcl.GCLCompiler ../tests/test1_2 ../tests/results/test1_2list.txt
-#../sam3
-#../macc3 <../tests/test1_1.dat >../tests/results/test1_2.result
+java -cp . gcl.GCLCompiler ../tests/test0 ../tests/results/test0list.txt
+../sam3
+../macc3 <../tests/test0.dat >../tests/results/test0.result
+java -cp . gcl.GCLCompiler ../tests/test0.fix ../tests/results/test0fixlist.txt
+../sam3
+../macc3 <../tests/test0.dat >../tests/results/test0fix.result
+java -cp . gcl.GCLCompiler ../tests/test1_1 ../tests/results/test1_1list.txt
+../sam3
+../macc3 <../tests/test1_1.dat >../tests/results/test1_1.result
+java -cp . gcl.GCLCompiler ../tests/test1_2 ../tests/results/test1_2list.txt
+../sam3
+../macc3 <../tests/test1_1.dat >../tests/results/test1_2.result
 java -cp . gcl.GCLCompiler ../tests/test2 ../tests/results/test2list.txt
 ../sam3
 ../macc3  >../tests/results/test2.result
