@@ -27,6 +27,7 @@ public interface Mnemonic {
 			return opCodes.get(opCode);
 		}
 		
+		@Override
 		public String toString(){
 			return samCode.trim();
 		}

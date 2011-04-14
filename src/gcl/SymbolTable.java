@@ -185,6 +185,7 @@ public class SymbolTable implements Iterable<SymbolTable.Entry>{
 			}
 		}
 
+		@Override
 		public String toString() {
 			return (isPublic() ? "public " : "private ") + entryKind
 					+ " entry: ID = " + identifierValue + " semantic: "

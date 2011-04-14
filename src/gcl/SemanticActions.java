@@ -23,6 +23,7 @@ abstract class SemanticItem {
 	// only common ancestor class.
 	private int level = -9; // This value should never appear
 
+	@Override
 	public String toString() {
 		return "Unknown semantic item. ";
 	}
@@ -59,6 +60,7 @@ class SemanticError extends SemanticItem implements GeneralError {
 		CompilerOptions.message(message);
 	}
 
+	@Override
 	public Expression expectExpression(final SemanticActions.GCLErrorStream err) {
 		// Soft cast
 		return new ErrorExpression("$ Expression Required");
@@ -66,6 +68,7 @@ class SemanticError extends SemanticItem implements GeneralError {
 		// occurred when this object was created.
 	}
 
+	@Override
 	public String toString() {
 		return message;
 	}
@@ -85,14 +88,17 @@ class Identifier extends SemanticItem {
 		return value;
 	}
 
+	@Override
 	public String toString() {
 		return value;
 	}
 
+	@Override
 	public int hashCode() {
 		return value.hashCode();
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		return (o instanceof Identifier)
 				&& value.equals(((Identifier) o).value);
@@ -108,6 +114,7 @@ abstract class Operator extends SemanticItem implements Mnemonic {
 		this.opcode = opcode;
 	}
 
+	@Override
 	public String toString() {
 		return value;
 	}
@@ -206,6 +213,7 @@ abstract class Expression extends SemanticItem implements Codegen.MaccSaveable {
 		return type;
 	}
 
+	@Override
 	public Expression expectExpression(final SemanticActions.GCLErrorStream err) {
 		return this;
 	} // soft cast
@@ -228,6 +236,7 @@ class ErrorExpression extends Expression implements GeneralError,
 		CompilerOptions.message(message);
 	}
 
+	@Override
 	public String toString() {
 		return message;
 	}
@@ -247,10 +256,12 @@ class ConstantExpression extends Expression implements CodegenConstants,
 		this.value = value;
 	}
 
+	@Override
 	public String toString() {
 		return "ConstantExpression: " + value + " with type " + type();
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		return (other instanceof ConstantExpression)
 				&& type().baseType().isCompatible(
@@ -258,6 +269,7 @@ class ConstantExpression extends Expression implements CodegenConstants,
 				&& ((ConstantExpression) other).value == value;
 	}
 
+	@Override
 	public int hashCode() {
 		return value * type().baseType().hashCode();
 	}
@@ -304,6 +316,7 @@ class VariableExpression extends Expression implements CodegenConstants {
 		this(type, 0, register, direct);
 	}
 
+	@Override
 	public boolean needsToBePushed() { // used by parallel assignment
 		return semanticLevel() > CPU_LEVEL
 				|| (semanticLevel() == CPU_LEVEL && !isDirect);
@@ -331,6 +344,7 @@ class VariableExpression extends Expression implements CodegenConstants {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return "VariableExpression: level(" + semanticLevel() + ") offset("
 				+ offset + ") " + (isDirect ? "direct" : "indirect")
@@ -470,6 +484,7 @@ class GCRecord extends SemanticItem // For guarded command statements if and do.
 		return outLabel;
 	}
 
+	@Override
 	public String toString() {
 		return "GCRecord out: " + outLabel + " next: " + nextLabel;
 	}
@@ -520,10 +535,12 @@ abstract class TypeDescriptor extends SemanticItem implements Cloneable {
 		return this;
 	}
 
+	@Override
 	public Object clone() {
 		return this;
 	}// Default version. Override in mutable subclasses.
 
+	@Override
 	public String toString() {
 		return "Unknown type.";
 	}
@@ -535,6 +552,7 @@ class ErrorType extends TypeDescriptor implements GeneralError {
 		super(0);
 	}
 
+	@Override
 	public String toString() {
 		return "Error type.";
 	}
@@ -555,12 +573,14 @@ class IntegerType extends TypeDescriptor implements CodegenConstants {
 		super(INT_SIZE);
 	}
 
+	@Override
 	public String toString() {
 		return "integer type.";
 	}
 
 	static public final IntegerType INTEGER_TYPE = new IntegerType();
 
+	@Override
 	public boolean isCompatible(final TypeDescriptor other) {
 		return other != null && other.baseType() instanceof IntegerType;
 	}
@@ -572,10 +592,12 @@ class BooleanType extends TypeDescriptor implements CodegenConstants {
 		super(INT_SIZE);
 	}
 
+	@Override
 	public String toString() {
 		return "Boolean type.";
 	}
 
+	@Override
 	public boolean isCompatible(final TypeDescriptor other) {
 		return other != null && other.baseType() instanceof BooleanType;
 	}
@@ -678,6 +700,7 @@ class TupleType extends TypeDescriptor { // mutable
 		}
 	}
 
+	@Override
 	public String toString() {
 		String result = "tupleType:[";
 		for (int i = 0; i < fields.size(); ++i) {
@@ -718,6 +741,7 @@ class TupleType extends TypeDescriptor { // mutable
 			this.type = type;
 		}
 
+		@Override
 		public String toString() {
 			return type.toString();
 		}
@@ -789,10 +813,12 @@ abstract class GCLError {
 			this.value = value;
 		}
 
+		@Override
 		public int value() {
 			return value;
 		}
 
+		@Override
 		public String message() {
 			return message;
 		}
