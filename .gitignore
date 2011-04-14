@@ -1,12 +1,9 @@
-*.class
+.DS_Store
+bin/
 *.swp
-src/gcl/Parser.java
-src/gcl/Scanner.java
+Parser.java
+Scanner.java
 tests/results
 bin/OBJ
 bin/codefile
 .settings
-bin/gcl/Scanner.class
-src/gcl/Parser.java
-src/gcl/Scanner.java
-
