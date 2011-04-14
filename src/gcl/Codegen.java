@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 // --------------------- Codegen ---------------------------------
 public class Codegen implements Mnemonic, CodegenConstants {
-	
+
 	private PrintWriter codefile;
 	private int labelIndex = 0; // Last label issued.
 	private int variableIndex = 0; // Address offset of next global allocated.
@@ -33,7 +33,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Reserve an address for a global variable
-	 * 
+	 *
 	 * @param size the number of bytes to reserve
 	 * @return the offset at which it will be stored
 	 */
@@ -45,7 +45,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Get a fresh unused label
-	 * 
+	 *
 	 * @return the number of the label.
 	 */
 	public int getLabel() {
@@ -54,7 +54,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * How many bytes are allocated to global variables?
-	 * 
+	 *
 	 * @return the size of the block
 	 */
 	public int variableBlockSize() {
@@ -63,7 +63,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Get an unused register or register pair -- must later be freed
-	 * 
+	 *
 	 * @param size number of registers to obtain (1 or 2)
 	 * @return the register number
 	 */
@@ -74,7 +74,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	/**
 	 * Free a register previously allocated. Only DREG and IREG operands are
 	 * freed.
-	 * 
+	 *
 	 * @param mode the addressing mode used with this register
 	 * @param base the register to (possibly) free
 	 */
@@ -84,7 +84,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Free the register held by a location object
-	 * 
+	 *
 	 * @param l the location holding the register
 	 */
 	public void freeTemp(final Location l) {
@@ -98,7 +98,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	/**
 	 * Tag interface to indicate objects have a representation in the Macc
 	 * runtime Used for Expressions and GCLStrings.
-	 * 
+	 *
 	 */
 	interface MaccSaveable {
 	}
@@ -107,7 +107,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	 * Tag interface to indicate the object behaves like a constant and has a
 	 * representation in the C1 block in the Macc runtime. Used for
 	 * ConstantExpressions and GCLStrings.
-	 * 
+	 *
 	 */
 	interface ConstantLike extends MaccSaveable {
 	}
@@ -115,7 +115,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	/**
 	 * Compute a location object that will point to an expression. This is the
 	 * major means of addressing SAM entities.
-	 * 
+	 *
 	 * @param semanticItem the expression whose addressability is needed
 	 * @param currentlevel the scoping level in which to compute the address
 	 * @return a Location object with appropriate mode, base, and displacement
@@ -155,7 +155,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Load a value into a register (or say which register if already loaded).
-	 * 
+	 *
 	 * @param expression  the expression to be loaded
 	 * @param currentlevel the scoping level from which to compute the address
 	 * @return the register that was used in the load
@@ -195,7 +195,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Load a value's address into a register, or say which if already loaded.
-	 * 
+	 *
 	 * @param semanticItem the expression whose address is to be loaded
 	 * @param currentlevel the scoping level from which to compute the address
 	 * @return the register that was used in the load
@@ -227,7 +227,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	 * Load an already existing pointer into a register if it isn't already in a
 	 * register. It is an error if the expression doesn't represent a pointer:
 	 * i.e. "indirect".
-	 * 
+	 *
 	 * @param expression the pointer expression to be loaded
 	 * @param currentLevel the the scoping level from which to compute the address
 	 * @return the register that holds a copy of the pointer
@@ -269,7 +269,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a 0 address instruction such as HALT
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemonic
 	 */
 	public void gen0Address(final SamOp opcode) {
@@ -278,7 +278,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a 1 address instruction such as WRI
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemonic
 	 * @param mode a valid addressing mode for the operand of the instruction
 	 * @param base a register for the operand
@@ -290,7 +290,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a 1 address instruction such as WRI
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemonic
 	 * @param l a location giving the operand of the instruction
 	 */
@@ -302,7 +302,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	 * Generate a 2 address instruction such as IA. These are also used
 	 * for INC and DEC, though reg is an amount to INC/DEC and not
 	 * a register.
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemonic
 	 * @param reg the register representing the first operand
 	 * @param mode  a valid addressing mode for the second operand of the
@@ -326,7 +326,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a 2 address instruction such as IA
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemonic
 	 * @param reg the register representing the first operand
 	 * @param l  a location giving the second operand of the instruction
@@ -338,7 +338,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	/**
 	 * Generate a two address instruction with a DMEM (label) for the second
 	 * operand.
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemnonic
 	 * @param reg the register representing the first operand
 	 * @param dmemLocation a string representing the second operand's label
@@ -346,10 +346,10 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	public void gen2Address(final SamOp opcode, final int reg, final String dmemLocation) {
 		writeFiles(opcode.samCodeString() + 'R' + reg + ", " + dmemLocation);
 	}
-	
+
 	/**
 	 * Generate a shift instruction. These are also used for PUSH and POP
-	 * 
+	 *
 	 * @param opcode the operation code as defined in Mnemnonic
 	 * @param reg the register representing the first operand
 	 * @param amount an integer in the range 1..16
@@ -357,7 +357,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	public void genShiftInstruction(final SamOp opcode, final int reg, final int amount){
 		writeFiles(opcode.samCodeString() + 'R' + reg + ", " + amount);
 	}
-	
+
 	/** Set a bit of a word corresponding to a register number.
 	 * @param reg the register to transform
 	 * @return an integer with one bit set
@@ -372,7 +372,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	public void genPushRegister(final int reg){
 		genShiftInstruction(PUSH, STACK_POINTER, regToBits(reg));
 	}
-	
+
 	/** Pop the top of the runtime stack into a register.
 	 * @param reg the register to receive the top of stack
 	 */
@@ -382,7 +382,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a jump to a label
-	 * 
+	 *
 	 * @param opcode the jump instruction
 	 * @param prefix a one character prefix character
 	 * @param offset  the integer value of the label
@@ -393,7 +393,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a label
-	 * 
+	 *
 	 * @param prefix the one character prefix
 	 * @param offset the integer value of the label
 	 */
@@ -403,7 +403,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a SAM pseudo op INT
-	 * 
+	 *
 	 * @param value the value of the integer
 	 */
 	public void genIntDirective(final int value) {
@@ -412,7 +412,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Generate a SAM pseudo op SKIP
-	 * 
+	 *
 	 * @param number  of bytes to skip
 	 */
 	public void genSkipDirective(final int value) {
@@ -438,7 +438,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 	/**
 	 * Comment the code arbitrarily -- usually for debugging
-	 * 
+	 *
 	 * @param comment the comment
 	 */
 	public void genCodeComment(final String comment) {
@@ -455,10 +455,10 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	/** Discard the current register set and return to the previous one
 	 */
 	private void restoreRegisterInformation(){
-		registers = savedRegisters.pop();		
+		registers = savedRegisters.pop();
 	}
-	
-	/** Restore the dirty registers from the current register set from the runtime stack. 
+
+	/** Restore the dirty registers from the current register set from the runtime stack.
 	 * It must have been previously pushed.
 	 * @param locals the additional size of the stack to remove - usually the local data size of a proc
 	 * @return the number of dirty registers in the current set
@@ -466,7 +466,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 	public int popRegisters(final int locals){
 		return registers.restore(locals);
 	}
-	
+
 	/** Save the dirty registers of the current register set to the runtime stack.
 	 * @param locals the additional size to reserve under the save area. Usually the local data size of a proc.
 	 * @param numberUsed the number of dirty registers in the current set
@@ -475,7 +475,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		registers.save(locals, numberUsed);
 		restoreRegisterInformation();
 	}
-	
+
 	/** Manages the registers in a way that they can be saved as a set. Saving the registers as a set is
 	 * useful in procedure call optimization.
 	 */
@@ -483,7 +483,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		private boolean[] freeRegisters = null;
 		private boolean[] pair = null;
 		private boolean[] wasUsed = null; //True if a register was ever used in this set. Dirty registers.
-		
+
 		public RegisterSet(){
 			freeRegisters = new boolean[MAX_REG + 1];
 			pair = new boolean[MAX_REG + 1];
@@ -495,10 +495,10 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			}
 			freeRegisters[STACK_POINTER] = false; // more later
 			freeRegisters[CONSTANT_BASE] = false;
-			freeRegisters[VARIABLE_BASE] = false;					
+			freeRegisters[VARIABLE_BASE] = false;
 		}
-	
-		
+
+
 		/** Allocate one or two (adjacent) registers from this set
 		 * @param size the number of registers (1 or 2)
 		 * @return the register number (of the first register if two)
@@ -527,7 +527,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			}
 			return result <= MAX_REG ? result : 0;
 		}
-		
+
 		/** conditionally free a register
 		 * @param mode the mode that was used with this register
 		 * @param base the register to attempt to free
@@ -564,7 +564,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 				}
 			}
 		}
-		
+
 		/** Restore the registers previously saved
 		 * @param locals the additional space allocated during "save"
 		 */
@@ -590,9 +590,9 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			}
 			return numberUsed;
 		}
-		
+
 		/** Print the allocated registers to the listing file
-		 * 
+		 *
 		 */
 		public void printAllocated() {
 			boolean old = CompilerOptions.listCode;
@@ -614,8 +614,8 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			CompilerOptions.listCode("");
 			CompilerOptions.listCode = old;
 		}
-	}	
-	
+	}
+
 	public final void init() {
 		try {
 			codefile = new PrintWriter(new FileOutputStream("codefile"));
@@ -648,7 +648,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		public static final Mode PCREL = new PCREL();
 
 		public abstract String address(int base, int displaement);
-		
+
 		public int bytesRequired(){ // number of bytes required for an instruction with this mode
 			assert bytesRequired==2 || bytesRequired==4;
 			return this.bytesRequired;
@@ -785,7 +785,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 
 		/**
 		 * The SemanticItem at this offset in the constant block.
-		 * 
+		 *
 		 * @return the semantic item (ConstantExpression or StringItem)
 		 */
 		public ConstantLike item() {
@@ -822,7 +822,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			return new Location(mode, base, displacement);
 		}
 
-		public void genConstBlock() { // Generate the C1 block data		
+		public void genConstBlock() { // Generate the C1 block data
 			Iterator<SamConstant> elements = elements();
 			while (elements.hasNext()) {
 				ConstantLike temp = (elements.next()).item();
@@ -838,14 +838,14 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		/**
 		 * Return an enumeration over all of the Sam Constants in the order in
 		 * which they were created.
-		 * 
+		 *
 		 * @return an enumeration over all the sam constants
 		 */
 		private static Iterator<SamConstant> elements() {
 			return storage.iterator();
 		}
 
-		static final void init(){ // needed to reinitialize between runs of GUICompiler	
+		static final void init(){ // needed to reinitialize between runs of GUICompiler
 			storage = new Stack<SamConstant>();
 		}
 	}

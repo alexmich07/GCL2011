@@ -2,46 +2,59 @@
      LDA     R14, C1
      LD      R13, #16000
      LD      R0, +0(R14)
-     STO     R0, +2(R15)
-     LD      R0, +2(R14)
      STO     R0, +0(R15)
+     LD      R0, +2(R14)
+     STO     R0, +2(R15)
+     LD      R0, +4(R14)
+     STO     R0, +4(R15)
+     WRI     +2(R15)
+     WRNL    
+     WRI     +4(R15)
+     WRNL    
+ LABEL J1
      LD      R1, +0(R15)
      LD      R0, #1
-     IC      R1, +2(R15)
-     JGT     &4
-     LD      R0, #0
-     STO     R0, +6(R15)
-     LD      R1, +6(R15)
-     LD      R0, #1
-     IC      R1, +4(R14)
-     JLT     &4
+     IC      R1, +6(R14)
+     JLE     &4
      LD      R0, #0
      IC      R0, #1
      JNE     J2
-     LD      R0, +6(R15)
-     IA      R0, +6(R14)
+     LD      R0, +0(R15)
+     IA      R0, +8(R14)
+     STO     R0, +0(R15)
+     LD      R0, +4(R15)
+     PUSH    R13, 1
+     POP     R13, 1
      STO     R0, +6(R15)
-     WRI     +8(R14)
+     LD      R0, +2(R15)
+     IA      R0, +4(R15)
+     STO     R0, +4(R15)
+     LD      R0, +6(R15)
+     PUSH    R13, 1
+     POP     R13, 1
+     STO     R0, +2(R15)
+     WRI     +4(R15)
      WRNL    
      JMP     J1
  LABEL J2
+     LD      R1, +0(R15)
      LD      R0, #1
-     IS      R0, +6(R15)
+     IC      R1, +10(R14)
+     JGT     &4
+     LD      R0, #0
      IC      R0, #1
      JNE     J3
-     WRI     +10(R14)
-     WRNL    
      JMP     J1
  LABEL J3
-     HALT    
- LABEL J1
+     WRI     +0(R15)
+     WRNL    
      HALT    
  LABEL C1
-     INT      10
-     INT      10
      INT      2
      INT      1
-     INT      0
      INT      1
+     INT      6
+     INT      1
+     INT      7
  LABEL V1
      SKIP     8

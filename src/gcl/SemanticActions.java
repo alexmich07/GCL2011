@@ -1292,7 +1292,9 @@ public class SemanticActions implements Mnemonic, CodegenConstants {
 	 * @return GCRecord entry with two label slots for this statement.
 	 **************************************************************************/
 	GCRecord startDo() {
-		return new GCRecord(codegen.getLabel(), 0);
+		int nextLoop = codegen.getLabel();
+		codegen.genLabel('J', nextLoop);
+		return new GCRecord(nextLoop, 0);
 	}
 
 	/***************************************************************************
@@ -1301,33 +1303,7 @@ public class SemanticActions implements Mnemonic, CodegenConstants {
 	 * @param entry GCRecord holding the labels for this statement.
 	 **************************************************************************/
 	void endDo(final GCRecord entry) {
-		//codegen.gen0Address(HALT);
-		codegen.genLabel('J', entry.outLabel());
-	}
 
-	/***************************************************************************
-	 * If the expr represents true, jump to the next else part.
-	 *
-	 * @param expression Expression to be tested: must be boolean
-	 * @param entry GCRecord with the associated labels. This is updated
-	 **************************************************************************/
-	void doTest(final Expression expression, final GCRecord entry) {
-		int resultreg = codegen.loadRegister(expression);
-		int nextElse = codegen.getLabel();
-		entry.nextLabel(nextElse);
-		codegen.gen2Address(IC, resultreg, IMMED, UNUSED, 1);
-		codegen.genJumpLabel(JNE, 'J', nextElse);
-		codegen.freeTemp(DREG, resultreg);
-	}
-
-	/***************************************************************************
-	 * Generate a jump to the out label and insert the next else label.
-	 *
-	 * @param entry GCRecord with the labels
-	 **************************************************************************/
-	void elseDo(final GCRecord entry) {
-		codegen.genJumpLabel(JMP, 'J', entry.outLabel());
-		codegen.genLabel('J', entry.nextLabel());
 	}
 
 	/***************************************************************************
