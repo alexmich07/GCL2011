@@ -113,6 +113,7 @@ class Buffer {
 		b.file = null;
 	}
 
+	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 		Close();
@@ -258,6 +259,7 @@ class UTF8Buffer extends Buffer {
 
 /* Bergin Replacement End */
 
+	@Override
 	public int Read() {
 		int ch;
 		do {

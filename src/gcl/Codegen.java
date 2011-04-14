@@ -664,6 +664,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class DREG extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return ("R" + base);
 			}
@@ -674,6 +675,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class DMEM extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return (displacement >= 0 ? "+" : "") + displacement;
 			}
@@ -684,6 +686,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class INDXD extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return (displacement >= 0 ? "+" : "") + displacement + "(R"
 						+ base + ')';
@@ -695,6 +698,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class IMMED extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return ("#" + displacement);
 			}
@@ -705,6 +709,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class IREG extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return ("*R" + base);
 			}
@@ -715,6 +720,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class IMEM extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return ((displacement >= 0 ? "*+" : "*") + displacement); //needed?
 			}
@@ -725,6 +731,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class IINDXD extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return (displacement >= 0 ? "*+" : "*") + displacement + "(R"
 						+ base + ')';
@@ -736,6 +743,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		private static class PCREL extends Mode {
+			@Override
 			public String address(final int base, final int displacement) {
 				return ("&" + displacement);
 			}
@@ -759,6 +767,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		// Note: No accessors, but this is an inner class
+		@Override
 		public boolean equals(Object obj) {
 			try {
 				Location other = (Location) obj;
@@ -768,6 +777,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			}
 		}
 
+		@Override
 		public int hashCode() {
 			return mode.samCode() * 11 + base * 17 + displacement;
 		}
@@ -792,6 +802,7 @@ public class Codegen implements Mnemonic, CodegenConstants {
 			return item;
 		}
 
+		@Override
 		public String toString() {
 			return "A const cell at offset: " + offset + ": " + item.toString();
 		}
@@ -810,8 +821,8 @@ public class Codegen implements Mnemonic, CodegenConstants {
 		}
 
 		public Location insertConstant(final ConstantLike semanticItem) {
-			Mode mode = Codegen.INDXD;
-			int base = Codegen.CONSTANT_BASE;
+			Mode mode = CodegenConstants.INDXD;
+			int base = CodegenConstants.CONSTANT_BASE;
 			int displacement = lookup(semanticItem);
 			if (displacement < 0) {
 				displacement = constantOffset;

@@ -38,6 +38,7 @@ public class GUICompiler extends Frame {
 		init();
 	}
 
+	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(500, 200);
 	}
@@ -87,6 +88,7 @@ public class GUICompiler extends Frame {
 		source.requestFocus();
 		addWindowListener // Anonymous inner class
 		(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
 				dispose();
 				System.exit(0);
